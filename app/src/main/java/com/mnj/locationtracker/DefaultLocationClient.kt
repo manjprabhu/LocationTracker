@@ -2,6 +2,7 @@ package com.mnj.locationtracker
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.hardware.Sensor
 import android.location.Location
 import android.location.LocationManager
 import android.os.Looper
@@ -23,6 +24,7 @@ class DefaultLocationClient(
                 throw LocationClient.LocationException("Missing location permission...")
             }
 
+
             val locationManager =
                 context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
             val isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
@@ -33,10 +35,10 @@ class DefaultLocationClient(
                 throw LocationClient.LocationException("GPS is disabled...")
             }
 
-            val request = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 1000)
+            val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 5000)
                 .setWaitForAccurateLocation(false)
-                .setMinUpdateIntervalMillis(500)
-                .setMaxUpdateDelayMillis(1000)
+                .setMinUpdateIntervalMillis(2500)
+                .setMaxUpdateDelayMillis(5000)
                 .build()
 
             val locationCallback = object : LocationCallback() {
@@ -50,9 +52,11 @@ class DefaultLocationClient(
                 }
             }
 
-            client.requestLocationUpdates(request,
+            client.requestLocationUpdates(
+                locationRequest,
                 locationCallback,
-                Looper.getMainLooper())
+                Looper.getMainLooper()
+            )
 
             awaitClose {
                 client.removeLocationUpdates(locationCallback)
